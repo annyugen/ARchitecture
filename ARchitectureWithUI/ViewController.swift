@@ -10,11 +10,14 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate { 
-    
+    //Mark: Outlets
+    @IBOutlet weak var ARSCNView: ARSCNView!
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
     
+    //Mark: Variables
     var modelNode: SCNNode?
+    var currentAngleY: Float = 0.0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,8 +50,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Show yellow feature points
         sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         
-        //let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
-        //sceneView.addGestureRecognizer(gestureRecognizer)
+        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
+        sceneView.addGestureRecognizer(gestureRecognizer)
+        let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
+        sceneView.addGestureRecognizer(rotateGestureRecognizer)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -75,9 +80,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
         //Add anchor to the scene
         sceneView.session.add(anchor: anchor)
-            
-        addModel(hitTest: hitTest, anchor: anchor)
         
+        //Calling addModel to add the model onto a detected plane.
+        addModel(hitTest: hitTest)
+        print(modelNode!)
     }
     
     // MARK: - ARSCNViewDelegate
@@ -125,7 +131,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.textColor = .yellow
         }
     }
-    
+/**
     // Mark: - renderer
     //There are automatically called when anchor and plane is automatically detecte by ARkit.
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
@@ -157,24 +163,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let z = CGFloat(planeAnchor.center.z)
         planeNode.position = SCNVector3(x, y, z)
     }
+*/
     
-    //Tap detection and add model on anywhere with plane detected on the screen.
-    /*
+    //Tap detection to test View.
     @objc func tapped(gesture: UITapGestureRecognizer) {
-        let touchPostion = gesture.location(in: sceneView)
-        let hitTestResult = sceneView.hitTest(touchPostion, types: .existingPlaneUsingExtent)
         print("tapped")
-        if !hitTestResult.isEmpty {
-            guard let hitResult = hitTestResult.first else {
-                return
-            }
-            addModel(hitTestResult: hitResult)
-        }
     }
-    */
     
     //Add house model into the scene
-    func addModel(hitTest: ARHitTestResult, anchor: ARAnchor) {
+    func addModel(hitTest: ARHitTestResult) {
         //Getting the house 3D model
         let scene = SCNScene(named: "art.scnassets/house.scn")!
         let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
@@ -182,9 +179,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Setting the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
-        
-        sceneView.scene.rootNode.addChildNode(houseNode!)
+        modelNode = houseNode
+        sceneView.scene.rootNode.addChildNode(modelNode!)
     }
     
+    @objc func rotate(_ gesture: UIPanGestureRecognizer) {
+        guard let nodeToRotate = modelNode else {return}
+        let translation = gesture.translation(in: gesture.view!)
+        
+        var newAngleY = (Float)(translation.x)*(Float)(Double.pi)/180.0
+        newAngleY += currentAngleY
+        
+        nodeToRotate.eulerAngles.y = newAngleY
+        
+        if(gesture.state == .ended) { currentAngleY = newAngleY }
+        
+        print(nodeToRotate.eulerAngles)
+    }
 }
 
