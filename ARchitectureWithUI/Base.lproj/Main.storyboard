@@ -20,17 +20,37 @@
                             <arscnView opaque="NO" clipsSubviews="YES" clearsContextBeforeDrawing="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nvr-8D-SiO">
                                 <rect key="frame" x="0.0" y="0.0" width="320" height="480"/>
                             </arscnView>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="statusLabel" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontForContentSizeCategory="YES" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QSf-LI-2lY" userLabel="statusLabel">
-                                <rect key="frame" x="20" y="40" width="280" height="20.5"/>
-                                <fontDescription key="fontDescription" style="UICTFontTextStyleBody"/>
+                            <label opaque="NO" userInteractionEnabled="NO" alpha="0.80000000000000004" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="statusLabel" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" minimumFontSize="7" translatesAutoresizingMaskIntoConstraints="NO" id="QSf-LI-2lY" userLabel="statusLabel">
+                                <rect key="frame" x="20" y="40" width="280" height="19.5"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="lightTextColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="VJA-NY-8Jb" userLabel="AddBtn">
-                                <rect key="frame" x="137" y="382" width="48" height="48"/>
+                                <rect key="frame" x="137" y="397" width="48" height="48"/>
                                 <state key="normal" image="add"/>
                                 <connections>
                                     <action selector="AddButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="3tf-nf-Zoq"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="koj-mc-mB4" userLabel="Settings">
+                                <rect key="frame" x="16" y="406" width="30" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="0Wz-lp-Xpq"/>
+                                    <constraint firstAttribute="height" constant="30" id="SEI-qa-FXX"/>
+                                </constraints>
+                                <state key="normal" image="cogwheel 2"/>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="fill" contentVerticalAlignment="fill" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="I5Y-Mg-s77" userLabel="Reset">
+                                <rect key="frame" x="277" y="406" width="27" height="30"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="27" id="Hl0-8T-Lml"/>
+                                    <constraint firstAttribute="height" constant="30" id="pRx-5z-6ZL"/>
+                                </constraints>
+                                <state key="normal" image="refresh"/>
+                                <connections>
+                                    <action selector="ResetButton:" destination="BYZ-38-t0r" eventType="touchUpInside" id="inr-7V-iaO"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -38,13 +58,18 @@
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="QSf-LI-2lY" secondAttribute="trailing" constant="20" id="5Ty-t3-YCX"/>
                             <constraint firstItem="QSf-LI-2lY" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="20" id="Cck-Cj-UaB"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="VJA-NY-8Jb" secondAttribute="bottom" constant="50" id="ISn-Pb-eeu"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="I5Y-Mg-s77" secondAttribute="bottom" constant="44" id="Hd2-ux-u1b"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="VJA-NY-8Jb" secondAttribute="bottom" constant="35" id="ISn-Pb-eeu"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="VJA-NY-8Jb" secondAttribute="trailing" constant="135" id="Oev-Gi-sqv"/>
                             <constraint firstItem="nvr-8D-SiO" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="QQA-Du-tkJ"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="koj-mc-mB4" secondAttribute="bottom" constant="44" id="Rcb-bv-Dh8"/>
                             <constraint firstItem="nvr-8D-SiO" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="VGr-AE-lag"/>
                             <constraint firstItem="QSf-LI-2lY" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="20" id="WGe-2E-HbT"/>
                             <constraint firstItem="nvr-8D-SiO" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="cKm-AJ-2xc"/>
+                            <constraint firstItem="koj-mc-mB4" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="16" id="kBN-cV-g4i"/>
                             <constraint firstItem="nvr-8D-SiO" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="l6R-6z-g1o"/>
+                            <constraint firstItem="I5Y-Mg-s77" firstAttribute="leading" secondItem="VJA-NY-8Jb" secondAttribute="trailing" constant="92" id="mhQ-4s-lye"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="I5Y-Mg-s77" secondAttribute="trailing" constant="16" id="rdb-dp-Rt2"/>
                             <constraint firstItem="VJA-NY-8Jb" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" constant="137" id="wm8-Wa-7aK"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
@@ -57,10 +82,12 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="114" y="116"/>
+            <point key="canvasLocation" x="112.5" y="115"/>
         </scene>
     </scenes>
     <resources>
         <image name="add" width="48" height="48"/>
+        <image name="cogwheel 2" width="128" height="128"/>
+        <image name="refresh" width="20" height="23"/>
     </resources>
 </document>

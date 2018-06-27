@@ -32,10 +32,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let scene = SCNScene()
         
         sceneView.scene = scene
-
-        statusLabel.layer.cornerRadius = 20.0
+        
+        //statusLabel UI configuration
         statusLabel.layer.masksToBounds = true
+        statusLabel.layer.cornerRadius = 8
         statusLabel.adjustsFontForContentSizeCategory = true
+        statusLabel.adjustsFontSizeToFitWidth = true
 
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -50,10 +52,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Show yellow feature points
         sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         
-        let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
-        sceneView.addGestureRecognizer(gestureRecognizer)
         let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
+        let scalingGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scale))
+        sceneView.addGestureRecognizer(scalingGestureRecognizer)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -86,6 +88,20 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         print(modelNode!)
     }
     
+    @IBAction func ResetButton(_ sender: UIButton) {
+        print("Reset session with new session created")
+        //Remove all of the Node (children nodes) generated within the scene.
+        self.sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
+            node.removeFromParentNode()
+        }
+        
+        //Re-initialize a new SCNScene session while clearing the previous session.
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = [.horizontal]
+        sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+    }
+    
+    
     // MARK: - ARSCNViewDelegate
     /*
      // Override to create and configure nodes for anchors added to the view's session.
@@ -110,16 +126,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    //Provide run-time tracking states to users.
+    //Provide run-time tracking states which is displayed by statusLabel
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
         //Show users the current states of ARCamera
         switch camera.trackingState {
         case .notAvailable:
             statusLabel.text = "Tracking not available"
-            statusLabel.textColor = .red
         case .normal:
             statusLabel.text = "Tracking normal"
-            statusLabel.textColor = .green
         case .limited(.excessiveMotion):
             statusLabel.text = "Tracking limited: excessive motion"
         case .limited(.insufficientFeatures):
@@ -128,7 +142,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.text = "Recovering from interruption"
         case .limited(.initializing):
             statusLabel.text = "Tracking limited: initializing"
-            statusLabel.textColor = .yellow
         }
     }
 /**
@@ -183,6 +196,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.scene.rootNode.addChildNode(modelNode!)
     }
     
+    //Rotation of model node.
     @objc func rotate(_ gesture: UIPanGestureRecognizer) {
         guard let nodeToRotate = modelNode else {return}
         let translation = gesture.translation(in: gesture.view!)
@@ -196,5 +210,33 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         print(nodeToRotate.eulerAngles)
     }
+    
+    //Scaling of the model node.
+    @objc func scale(_ gesture: UIPinchGestureRecognizer) {
+        guard let nodeToScale = modelNode else {return}
+        
+        if gesture.state == .changed {
+            let pinchToScaleX: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.x)
+            let pinchToScaleY: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.y)
+            let pinchToScaleZ: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.z)
+            
+            //After getting pinch intensity in CGFloat, pass them to scale.
+            nodeToScale.scale = SCNVector3Make(Float(pinchToScaleX),Float(pinchToScaleY),Float(pinchToScaleZ))
+            
+            print(nodeToScale.scale)
+            print("Velocity: ",gesture.velocity)
+
+            gesture.scale = 1 //Reset the new scale to 1 -> give more accurate scaling.
+        }
+        if gesture.state == .ended {print("Pinch gestured completed.", "Pinch scale set to: ", gesture.scale)}
+    }
 }
+
+
+
+
+
+
+
+
 
