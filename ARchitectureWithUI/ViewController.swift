@@ -10,11 +10,14 @@ import SceneKit
 import ARKit
 
 class ViewController: UIViewController, ARSCNViewDelegate { 
-    
+    //Mark: Outlets
+    @IBOutlet weak var ARSCNView: ARSCNView!
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
     
+    //Mark: Variables
     var modelNode: SCNNode?
+    var currentAngleY: Float = 0.0
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,10 +32,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let scene = SCNScene()
         
         sceneView.scene = scene
-
-        statusLabel.layer.cornerRadius = 20.0
+        
+        //statusLabel UI configuration
         statusLabel.layer.masksToBounds = true
+        statusLabel.layer.cornerRadius = 8
         statusLabel.adjustsFontForContentSizeCategory = true
+        statusLabel.adjustsFontSizeToFitWidth = true
 
     }
     override func viewWillAppear(_ animated: Bool) {
@@ -47,8 +52,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Show yellow feature points
         sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         
-        //let gestureRecognizer = UITapGestureRecognizer(target: self, action: #selector(tapped))
-        //sceneView.addGestureRecognizer(gestureRecognizer)
+        let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
+        sceneView.addGestureRecognizer(rotateGestureRecognizer)
+        let scalingGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scale))
+        sceneView.addGestureRecognizer(scalingGestureRecognizer)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -75,10 +82,25 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             
         //Add anchor to the scene
         sceneView.session.add(anchor: anchor)
-            
-        addModel(hitTest: hitTest, anchor: anchor)
         
+        //Calling addModel to add the model onto a detected plane.
+        addModel(hitTest: hitTest)
+        print(modelNode!)
     }
+    
+    @IBAction func ResetButton(_ sender: UIButton) {
+        print("Reset session with new session created")
+        //Remove all of the Node (children nodes) generated within the scene.
+        self.sceneView.scene.rootNode.enumerateChildNodes { (node, stop) in
+            node.removeFromParentNode()
+        }
+        
+        //Re-initialize a new SCNScene session while clearing the previous session.
+        let configuration = ARWorldTrackingConfiguration()
+        configuration.planeDetection = [.horizontal]
+        sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+    }
+    
     
     // MARK: - ARSCNViewDelegate
     /*
@@ -104,16 +126,14 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
     }
     
-    //Provide run-time tracking states to users.
+    //Provide run-time tracking states which is displayed by statusLabel
     func session(_ session: ARSession, cameraDidChangeTrackingState camera: ARCamera) {
         //Show users the current states of ARCamera
         switch camera.trackingState {
         case .notAvailable:
             statusLabel.text = "Tracking not available"
-            statusLabel.textColor = .red
         case .normal:
             statusLabel.text = "Tracking normal"
-            statusLabel.textColor = .green
         case .limited(.excessiveMotion):
             statusLabel.text = "Tracking limited: excessive motion"
         case .limited(.insufficientFeatures):
@@ -122,10 +142,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.text = "Recovering from interruption"
         case .limited(.initializing):
             statusLabel.text = "Tracking limited: initializing"
-            statusLabel.textColor = .yellow
         }
     }
-    
+/**
     // Mark: - renderer
     //There are automatically called when anchor and plane is automatically detecte by ARkit.
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
@@ -157,24 +176,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let z = CGFloat(planeAnchor.center.z)
         planeNode.position = SCNVector3(x, y, z)
     }
+*/
     
-    //Tap detection and add model on anywhere with plane detected on the screen.
-    /*
+    //Tap detection to test View.
     @objc func tapped(gesture: UITapGestureRecognizer) {
-        let touchPostion = gesture.location(in: sceneView)
-        let hitTestResult = sceneView.hitTest(touchPostion, types: .existingPlaneUsingExtent)
         print("tapped")
-        if !hitTestResult.isEmpty {
-            guard let hitResult = hitTestResult.first else {
-                return
-            }
-            addModel(hitTestResult: hitResult)
-        }
     }
-    */
     
     //Add house model into the scene
-    func addModel(hitTest: ARHitTestResult, anchor: ARAnchor) {
+    func addModel(hitTest: ARHitTestResult) {
         //Getting the house 3D model
         let scene = SCNScene(named: "art.scnassets/house.scn")!
         let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
@@ -182,9 +192,51 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Setting the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
-        
-        sceneView.scene.rootNode.addChildNode(houseNode!)
+        modelNode = houseNode
+        sceneView.scene.rootNode.addChildNode(modelNode!)
     }
     
+    //Rotation of model node.
+    @objc func rotate(_ gesture: UIPanGestureRecognizer) {
+        guard let nodeToRotate = modelNode else {return}
+        let translation = gesture.translation(in: gesture.view!)
+        
+        var newAngleY = (Float)(translation.x)*(Float)(Double.pi)/180.0
+        newAngleY += currentAngleY
+        
+        nodeToRotate.eulerAngles.y = newAngleY
+        
+        if(gesture.state == .ended) { currentAngleY = newAngleY }
+        
+        print(nodeToRotate.eulerAngles)
+    }
+    
+    //Scaling of the model node.
+    @objc func scale(_ gesture: UIPinchGestureRecognizer) {
+        guard let nodeToScale = modelNode else {return}
+        
+        if gesture.state == .changed {
+            let pinchToScaleX: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.x)
+            let pinchToScaleY: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.y)
+            let pinchToScaleZ: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.z)
+            
+            //After getting pinch intensity in CGFloat, pass them to scale.
+            nodeToScale.scale = SCNVector3Make(Float(pinchToScaleX),Float(pinchToScaleY),Float(pinchToScaleZ))
+            
+            print(nodeToScale.scale)
+            print("Velocity: ",gesture.velocity)
+
+            gesture.scale = 1 //Reset the new scale to 1 -> give more accurate scaling.
+        }
+        if gesture.state == .ended {print("Pinch gestured completed.", "Pinch scale set to: ", gesture.scale)}
+    }
 }
+
+
+
+
+
+
+
+
 
