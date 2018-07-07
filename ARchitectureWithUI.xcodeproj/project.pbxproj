@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		926695D220CEF3DE00CABFD8 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 926695D120CEF3DE00CABFD8 /* art.scnassets */; };
 		92BFA76B20D750F8006FF48D /* Focus Square in Resources */ = {isa = PBXBuildFile; fileRef = 92BFA76A20D750F8006FF48D /* Focus Square */; };
-		92D0079420D1A2D700F4A79A /* ARState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92D0079320D1A2D700F4A79A /* ARState.swift */; };
 		92E87AD020CEF1B800CBDF15 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E87ACF20CEF1B800CBDF15 /* AppDelegate.swift */; };
 		92E87AD220CEF1B800CBDF15 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E87AD120CEF1B800CBDF15 /* ViewController.swift */; };
 		92E87AD520CEF1B800CBDF15 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 92E87AD320CEF1B800CBDF15 /* Main.storyboard */; };
@@ -21,7 +20,6 @@
 /* Begin PBXFileReference section */
 		926695D120CEF3DE00CABFD8 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
 		92BFA76A20D750F8006FF48D /* Focus Square */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Focus Square"; sourceTree = "<group>"; };
-		92D0079320D1A2D700F4A79A /* ARState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ARState.swift; sourceTree = "<group>"; };
 		92E87ACC20CEF1B800CBDF15 /* ARchitectureWithUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARchitectureWithUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E87ACF20CEF1B800CBDF15 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		92E87AD120CEF1B800CBDF15 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -79,7 +77,6 @@
 				92E87ADB20CEF1B900CBDF15 /* Info.plist */,
 				92BFA76A20D750F8006FF48D /* Focus Square */,
 				926695D120CEF3DE00CABFD8 /* art.scnassets */,
-				92D0079320D1A2D700F4A79A /* ARState.swift */,
 			);
 			path = ARchitectureWithUI;
 			sourceTree = "<group>";
@@ -159,7 +156,6 @@
 			files = (
 				92E87AD220CEF1B800CBDF15 /* ViewController.swift in Sources */,
 				92E87AD020CEF1B800CBDF15 /* AppDelegate.swift in Sources */,
-				92D0079420D1A2D700F4A79A /* ARState.swift in Sources */,
 				92EBE14C20D5F13900D777EE /* TrackingStatusViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -305,14 +301,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E99E9WZUS2;
+				DEVELOPMENT_TEAM = S334JNRP3F;
 				INFOPLIST_FILE = ARchitectureWithUI/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.An.ARchitectureWithUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lampham.ARchitectureWithUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -324,14 +320,14 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = E99E9WZUS2;
+				DEVELOPMENT_TEAM = S334JNRP3F;
 				INFOPLIST_FILE = ARchitectureWithUI/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.An.ARchitectureWithUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lampham.ARchitectureWithUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
