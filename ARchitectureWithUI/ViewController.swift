@@ -9,6 +9,7 @@ import UIKit
 import SceneKit
 import ARKit
 
+
 class ViewController: UIViewController, ARSCNViewDelegate { 
     //Mark: Outlets
     @IBOutlet weak var ARSCNView: ARSCNView!
@@ -18,7 +19,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     //Mark: Variables
     var modelNode: SCNNode?
     var currentAngleY: Float = 0.0
-
+    var secondResultLabelText : String!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -33,13 +35,15 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         sceneView.scene = scene
         
+        print(secondResultLabelText) 
         //statusLabel UI configuration
         statusLabel.layer.masksToBounds = true
         statusLabel.layer.cornerRadius = 8
         statusLabel.adjustsFontForContentSizeCategory = true
         statusLabel.adjustsFontSizeToFitWidth = true
-
+        statusLabel.isHidden = true //Hidden until switched on in Setting
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
@@ -47,10 +51,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = .horizontal
         
+        // Allow image recognition 
+        configuration.detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil)
         // Run the view's session
         sceneView.session.run(configuration)
-        //Show yellow feature points
-        sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         
         let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
@@ -69,6 +73,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == "SettingViewSegue" {
+//            let secondView = segue.destination as? SettingViewController
+//        }
+//    }
     
     //Add button, hitTest the middle point on device screen. Then call addModel.
     @IBAction func AddButton(_ sender: UIButton) {
@@ -99,6 +109,36 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal]
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+    }
+    
+    //MARK: Setting popover
+    @IBOutlet var subView: UIView!
+    
+    @IBAction func SettingButton(_ sender: UIButton) {
+        print("Setting Button Pressed")
+        self.view.addSubview(subView)
+        subView.center = self.view.center
+    }
+    
+    @IBAction func subViewDone(_ sender: Any) {
+        self.subView.removeFromSuperview()
+    }
+
+    @IBAction func trackingStateSwitch(_ sender: UISwitch) {
+        if (sender.isOn == false) {
+            statusLabel.isHidden = true;
+        } else {
+            statusLabel.isHidden = false;
+        }
+    }
+    
+    @IBAction func featurePointSwitch(_ sender: UISwitch) {
+        if (sender.isOn == true) {
+            //Show yellow feature points
+            sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
+        } else {
+             sceneView.debugOptions = []
+        }
     }
     
     
@@ -144,8 +184,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.text = "Tracking limited: initializing"
         }
     }
-/**
     // Mark: - renderer
+    
+/**
     //There are automatically called when anchor and plane is automatically detecte by ARkit.
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
@@ -178,24 +219,22 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 */
     
-    //Tap detection to test View.
-    @objc func tapped(gesture: UITapGestureRecognizer) {
-        print("tapped")
-    }
-    
     //Add house model into the scene
     func addModel(hitTest: ARHitTestResult) {
         //Getting the house 3D model
         let scene = SCNScene(named: "art.scnassets/house.scn")!
         let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
         
-        //Setting the model position within the scene.
+        //Set the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
         modelNode = houseNode
         sceneView.scene.rootNode.addChildNode(modelNode!)
+        print(modelNode?.name! as Any)
+        
     }
     
+    //MARK: Anchored object manipulation
     //Rotation of model node.
     @objc func rotate(_ gesture: UIPanGestureRecognizer) {
         guard let nodeToRotate = modelNode else {return}
@@ -230,6 +269,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         if gesture.state == .ended {print("Pinch gestured completed.", "Pinch scale set to: ", gesture.scale)}
     }
+    
 }
 
 
