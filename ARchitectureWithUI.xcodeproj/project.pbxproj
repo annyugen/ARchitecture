@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9200CAF020F276A3001FAE6F /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9200CAEF20F276A3001FAE6F /* SettingViewController.swift */; };
 		926695D220CEF3DE00CABFD8 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 926695D120CEF3DE00CABFD8 /* art.scnassets */; };
 		92BFA76B20D750F8006FF48D /* Focus Square in Resources */ = {isa = PBXBuildFile; fileRef = 92BFA76A20D750F8006FF48D /* Focus Square */; };
 		92E87AD020CEF1B800CBDF15 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E87ACF20CEF1B800CBDF15 /* AppDelegate.swift */; };
@@ -18,6 +19,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9200CAEF20F276A3001FAE6F /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		926695D120CEF3DE00CABFD8 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
 		92BFA76A20D750F8006FF48D /* Focus Square */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Focus Square"; sourceTree = "<group>"; };
 		92E87ACC20CEF1B800CBDF15 /* ARchitectureWithUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARchitectureWithUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,6 +73,7 @@
 				926695D320CEF4FB00CABFD8 /* Resources */,
 				92E87ACF20CEF1B800CBDF15 /* AppDelegate.swift */,
 				92E87AD120CEF1B800CBDF15 /* ViewController.swift */,
+				9200CAEF20F276A3001FAE6F /* SettingViewController.swift */,
 				92EBE14B20D5F13900D777EE /* TrackingStatusViewController.swift */,
 				92E87AD320CEF1B800CBDF15 /* Main.storyboard */,
 				92E87AD820CEF1B900CBDF15 /* LaunchScreen.storyboard */,
@@ -157,6 +160,7 @@
 				92E87AD220CEF1B800CBDF15 /* ViewController.swift in Sources */,
 				92E87AD020CEF1B800CBDF15 /* AppDelegate.swift in Sources */,
 				92EBE14C20D5F13900D777EE /* TrackingStatusViewController.swift in Sources */,
+				9200CAF020F276A3001FAE6F /* SettingViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -303,12 +307,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = S334JNRP3F;
 				INFOPLIST_FILE = ARchitectureWithUI/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.lampham.ARchitectureWithUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Lam.ARchitectureWithUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -322,12 +326,12 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = S334JNRP3F;
 				INFOPLIST_FILE = ARchitectureWithUI/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 11.3;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.lampham.ARchitectureWithUI;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Lam.ARchitectureWithUI;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 4.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

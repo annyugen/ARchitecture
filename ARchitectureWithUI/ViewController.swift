@@ -8,39 +8,38 @@
 import UIKit
 import SceneKit
 import ARKit
+import Foundation
+
 
 class ViewController: UIViewController, ARSCNViewDelegate {
+    
+    struct AnimationInfo{
+        var startTime: TimeInterval
+        var duration: TimeInterval
+        var initialPosition: float3
+        var finalPosition: float3
+        var initialOrientation: simd_quatf
+        var finalOrientation: simd_quatf
+    }
+
     //Mark: Outlets
-    @IBOutlet var optionButton: [UIButton]!
     @IBOutlet weak var ARSCNView: ARSCNView!
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
-    @IBOutlet weak var spinner: UIActivityIndicatorView!
-
     
-    @IBAction func handleSelection(_ sender: UIButton) {
-        optionButton.forEach{
-            (button) in
-            UIView.animate(withDuration: 0.3, animations: {
-                button.isHidden = !button.isHidden
-                self.view.layoutIfNeeded()
-                })
-        }
-    }
-    
-    @IBAction func optionTap(_ sender: UIButton) {
-    }
     //Mark: Variables
     var modelNode: SCNNode?
     var currentAngleY: Float = 0.0
-
-    @IBOutlet weak var setting: UIButton!
+    var secondResultLabelText : String!
+    private var houseNode : SCNNode?
+    private var imageNode: SCNNode?
+    private var animationInfo: ViewController.AnimationInfo?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         //Set the view's delegate
         sceneView.delegate = self
-        
         
         //Display arkit stat
         sceneView.showsStatistics = true
@@ -50,20 +49,31 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         sceneView.scene = scene
         
+        print(secondResultLabelText) 
         //statusLabel UI configuration
         statusLabel.layer.masksToBounds = true
         statusLabel.layer.cornerRadius = 8
         statusLabel.adjustsFontForContentSizeCategory = true
         statusLabel.adjustsFontSizeToFitWidth = true
-
+        statusLabel.isHidden = true //Hidden until switched on in Setting
     }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         // Create a session configuration
         let configuration = ARWorldTrackingConfiguration()
+        
+        
         configuration.planeDetection = .horizontal
         
+        // Allow image recognition 
+        guard let referenceImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil)
+        else {
+            fatalError("Missing expected asset catalog resources")
+        }
+        
+        configuration.detectionImages = referenceImages
         // Run the view's session
         sceneView.session.run(configuration)
         //Show yellow feature points
@@ -73,7 +83,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
         let scalingGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scale))
         sceneView.addGestureRecognizer(scalingGestureRecognizer)
+        
+        
     }
+    
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
@@ -86,6 +99,12 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+
+//    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+//        if segue.identifier == "SettingViewSegue" {
+//            let secondView = segue.destination as? SettingViewController
+//        }
+//    }
     
     //Add button, hitTest the middle point on device screen. Then call addModel.
     @IBAction func AddButton(_ sender: UIButton) {
@@ -105,8 +124,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         print(modelNode!)
     }
     
-
-    
     @IBAction func ResetButton(_ sender: UIButton) {
         print("Reset session with new session created")
         //Remove all of the Node (children nodes) generated within the scene.
@@ -118,6 +135,36 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal]
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
+    }
+    
+    //MARK: Setting popover
+    @IBOutlet var subView: UIView!
+    
+    @IBAction func SettingButton(_ sender: UIButton) {
+        print("Setting Button Pressed")
+        self.view.addSubview(subView)
+        subView.center = self.view.center
+    }
+    
+    @IBAction func subViewDone(_ sender: Any) {
+        self.subView.removeFromSuperview()
+    }
+
+    @IBAction func trackingStateSwitch(_ sender: UISwitch) {
+        if (sender.isOn == false) {
+            statusLabel.isHidden = true;
+        } else {
+            statusLabel.isHidden = false;
+        }
+    }
+    
+    @IBAction func featurePointSwitch(_ sender: UISwitch) {
+        if (sender.isOn == true) {
+            //Show yellow feature points
+            sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
+        } else {
+             sceneView.debugOptions = []
+        }
     }
     
     
@@ -163,8 +210,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.text = "Tracking limited: initializing"
         }
     }
-/**
     // Mark: - renderer
+    
+/**
     //There are automatically called when anchor and plane is automatically detecte by ARkit.
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         guard let planeAnchor = anchor as? ARPlaneAnchor else { return }
@@ -197,26 +245,113 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     }
 */
     
-    //Tap detection to test View.
-    @objc func tapped(gesture: UITapGestureRecognizer) {
-        print("tapped")
+    //Set image//
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor){
+        guard let imageAnchor = anchor as? ARImageAnchor else {
+        return
+        }
+        //Get 3D model//
+        let scene = SCNScene(named: "art.scnassets/house.scn")!
+        let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)!
+    
+        ///Calculate bounding box//
+        let (min, max) = houseNode.boundingBox
+        let size = SCNVector3(max.x - min.x, max.y - min.y, max.z - min.z)
+    
+    
+        //Ratio images//
+        let widthRatio = Float(imageAnchor.referenceImage.physicalSize.width) / size.x
+        let heightRatio = Float(imageAnchor.referenceImage.physicalSize.height) / size.z
+    
+    
+        ///Transform the model//
+        let ratioBest = [widthRatio, heightRatio].min()
+        houseNode.transform = SCNMatrix4(imageAnchor.transform)
+    
+        let imageAction = SCNAction.scale(to: CGFloat(ratioBest!), duration: 0.5)
+        imageAction.timingMode = .easeOut
+    
+        houseNode.scale = SCNVector3(0,0,0)
+        //Add to root//
+        sceneView.scene.rootNode.addChildNode(houseNode)
+        houseNode.runAction(imageAction)
+    
+        self.houseNode = houseNode
+        self.imageNode = node
+    }
+    
+    func renderer(_ renderer: SCNSceneRenderer, updateAtTime time: TimeInterval){
+        guard let imageNode = imageNode,
+            let houseNode = houseNode else{
+                return
+        }
+        
+        
+        ///Set animation position & orientation//
+        guard let animationInfo = animationInfo else {
+            refreshAnimationVariables( startTime: time,
+                                       initialPosition: houseNode.simdWorldPosition,
+                                       finalPosition: imageNode.simdWorldPosition,
+                                       initialOrientation: houseNode.simdWorldOrientation,
+                                       finalOrientation: imageNode.simdWorldOrientation
+                                       )
+            return
+        }
+        
+        if !simd_equal(animationInfo.finalPosition, animationInfo.finalPosition) || animationInfo.initialOrientation != animationInfo.finalOrientation {
+            refreshAnimationVariables(startTime: time, initialPosition: houseNode.simdWorldPosition, finalPosition: imageNode.simdWorldPosition, initialOrientation: houseNode.simdWorldOrientation, finalOrientation: imageNode.simdWorldOrientation)
+            
+            //Transition time//
+            let timePassed = time - animationInfo.duration
+            var t = min(Float(timePassed / animationInfo.duration),1)
+            t = sin (t * .pi * 0.5)
+            
+            //Reposition new model//
+            let new_t = simd_make_float3(t,t,t)
+            
+            houseNode.simdWorldPosition = simd_mix(animationInfo.initialPosition, animationInfo.finalPosition, new_t)
+            houseNode.simdWorldOrientation = simd_slerp(animationInfo.initialOrientation, animationInfo.finalOrientation, t)
+            
+        }
+        
+    }
+    
+    func refreshAnimationVariables(startTime: TimeInterval, initialPosition: float3, finalPosition: float3, initialOrientation: simd_quatf, finalOrientation: simd_quatf){
+        let distance = simd_distance(initialPosition, finalPosition)
+        
+        //Set movement speed//
+        let speed = Float(0.2)
+        
+        let animationDuration = Double(min(max(0.1, distance / speed), 2))
+        
+        animationInfo = ViewController.AnimationInfo (
+            startTime: startTime,
+            duration: animationDuration,
+            initialPosition: initialPosition,
+            finalPosition: finalPosition,
+            initialOrientation: initialOrientation,
+            finalOrientation: finalOrientation
+         )
+        
     }
     
     //Add house model into the scene
     func addModel(hitTest: ARHitTestResult) {
-        //Getting the house 3D model
         
+        //Get 3D model//
         let scene = SCNScene(named: "art.scnassets/house.scn")!
-        let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
+        let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)!
         
-        //Setting the model position within the scene.
-        houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
+        //Set the model position within the scene.
+        houseNode.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
         modelNode = houseNode
         sceneView.scene.rootNode.addChildNode(modelNode!)
-        sceneView.autoenablesDefaultLighting = true;
+        print(modelNode?.name! as Any)
+        
     }
     
+    //MARK: Anchored object manipulation
     //Rotation of model node.
     @objc func rotate(_ gesture: UIPanGestureRecognizer) {
         guard let nodeToRotate = modelNode else {return}
@@ -251,6 +386,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         }
         if gesture.state == .ended {print("Pinch gestured completed.", "Pinch scale set to: ", gesture.scale)}
     }
+    
 }
 
 
