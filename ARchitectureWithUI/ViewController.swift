@@ -27,6 +27,9 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
     
+    var state = false
+    var featurePts = ARSCNDebugOptions.showFeaturePoints
+    
     //Mark: Variables
     var modelNode: SCNNode?
     var currentAngleY: Float = 0.0
@@ -40,6 +43,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Do any additional setup after loading the view, typically from a nib.
         //Set the view's delegate
         sceneView.delegate = self
+        self.statusLabel.isHidden = state
+        self.sceneView.debugOptions = featurePts
         
         //Display arkit stat
         sceneView.showsStatistics = true
@@ -76,8 +81,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         configuration.detectionImages = referenceImages
         // Run the view's session
         sceneView.session.run(configuration)
-        //Show yellow feature points
-        sceneView.debugOptions = ARSCNDebugOptions.showFeaturePoints
         
         let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
@@ -150,6 +153,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         self.subView.removeFromSuperview()
     }
 
+    /*
     @IBAction func trackingStateSwitch(_ sender: UISwitch) {
         if (sender.isOn == false) {
             statusLabel.isHidden = true;
@@ -157,6 +161,10 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.isHidden = false;
         }
     }
+ 
+ 
+    
+    
     
     @IBAction func featurePointSwitch(_ sender: UISwitch) {
         if (sender.isOn == true) {
@@ -166,6 +174,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
              sceneView.debugOptions = []
         }
     }
+ 
+     */
+    
+    
+
     
     
     // MARK: - ARSCNViewDelegate
