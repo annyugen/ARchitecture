@@ -20,6 +20,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var modelNode: SCNNode?
     var currentAngleY: Float = 0.0
     var secondResultLabelText : String!
+    var imageHighlightAction: SCNAction {
+        return .sequence([
+            .wait(duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOpacity(to: 0.15, duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOut(duration: 0.5),
+            .removeFromParentNode()
+            ])
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +66,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Run the view's session
         sceneView.session.run(configuration)
         
+        // Config to track user's gestures
         let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
         let scalingGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scale))
@@ -184,7 +195,63 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.text = "Tracking limited: initializing"
         }
     }
-    // Mark: - renderer
+    
+    // Mark: - Renderer
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        guard let imageAnchor = anchor as? ARImageAnchor else { return }
+        
+//        let scene = SCNScene(named: "art.scnassets/house.scn")!
+//        let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
+//
+//        let (min, max) = (houseNode?.boundingBox)!
+//        let size = SCNVector3Make(max.x - min.x, max.y - min.y, max.z - min.z)
+//
+//        // 3. Calculate the ratio of difference between real image and object size.
+//        // Ignore Y axis because it will be pointed out of the image.
+//        let widthRatio = Float(imageAnchor.referenceImage.physicalSize.width)/size.x
+//        let heightRatio = Float(imageAnchor.referenceImage.physicalSize.height)/size.z
+//        // Pick smallest value to be sure that object fits into the image.
+//        let finalRatio = [widthRatio, heightRatio].min()!
+//
+//        // 4. Set transform from imageAnchor data.
+//        houseNode?.transform = SCNMatrix4(imageAnchor.transform)
+//
+//        // 5. Animate appearance by scaling model from 0 to previously calculated value.
+//        let appearanceAction = SCNAction.scale(to: CGFloat(finalRatio), duration: 0.4)
+//        appearanceAction.timingMode = .easeOut
+//        // Set initial scale to 0.
+//        houseNode?.scale = SCNVector3Make(0, 0, 0)
+//        // Add to root node.
+//        sceneView.scene.rootNode.addChildNode(houseNode!)
+//        // Run the appearance animation.
+//        houseNode?.runAction(appearanceAction)
+        
+
+        
+        let referenceImage = imageAnchor.referenceImage
+        let imageName = imageAnchor.referenceImage.name
+
+        print("DETECTED IMAGE: ", imageName!)
+
+        // Drawing out the plane and re-position it so it's parallel to the deteced image
+        let plane = SCNPlane(width: referenceImage.physicalSize.width, height: referenceImage.physicalSize.height)
+        let planeNode = SCNNode(geometry: plane)
+        planeNode.opacity = 0.20
+        planeNode.eulerAngles.x = -.pi/2
+
+        // Apply imageHighlightAction animation onto the plane.
+        planeNode.runAction(imageHighlightAction)
+        node.addChildNode(planeNode)
+
+        if imageName == "house-blueprint" {
+            let scene = SCNScene(named: "art.scnassets/house.scn")!
+            let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
+            houseNode?.position = SCNVector3(imageAnchor.transform.columns.3.x,imageAnchor.transform.columns.3.y + 0.1,imageAnchor.transform.columns.3.z)
+            sceneView.scene.rootNode.addChildNode(houseNode!)
+
+
+        }
+    }
     
 /**
     //There are automatically called when anchor and plane is automatically detecte by ARkit.
@@ -231,7 +298,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         modelNode = houseNode
         sceneView.scene.rootNode.addChildNode(modelNode!)
         print(modelNode?.name! as Any)
-        
     }
     
     //MARK: Anchored object manipulation
