@@ -17,7 +17,7 @@ iOS device with iOS 11.0++
 
 A step by step series of examples that tell you how to get a development env running
 
-- Clone the respository using ```git clone https://github.com/lampham3110/ARchitecture-1.git``` or Download ZIP file
+- Clone the respository using ```git clone https://github.com/lampham3110/ARchitecture-1.git``` or ```Download ZIP file```
 - Run Xcode -> Add Project
 - Click on the root folder when the project is up running
 - Change the provisoning 
