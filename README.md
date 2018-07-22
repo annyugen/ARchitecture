@@ -11,7 +11,7 @@ These instructions will get you a copy of the project up and running on your loc
 Things you need to install the software and how to install them
 
 Xcode 9.0++
-iOS devide with iOS 11.0++
+iOS device with iOS 11.0++
 
 ### Installing
 
