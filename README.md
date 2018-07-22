@@ -44,11 +44,12 @@ Give an example
 
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+Deploy the application requires paying fee being in The Apple Developer Program. No deployment is intended at the moment. 
 
 ## Built With
 
 * [ARKit](https://developer.apple.com/documentation/arkit) - The augmented reality framework used
+* [Sketchup](https://www.sketchup.com/) - 3D models imported
 
 ## Contributing
 
@@ -60,9 +61,8 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Lam Pham**
+* **An Nguyen**
 
 ## License
 
