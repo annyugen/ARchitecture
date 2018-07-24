@@ -64,7 +64,7 @@ class ModelViewController : UITableViewController {
              tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
         } else{
              tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.checkmark
-             checkedModels.append(models[indexPath.row])
+             checkedModels.append(models[indexPath.row]) //Array of checked models, not sure//
         }
         
     }
