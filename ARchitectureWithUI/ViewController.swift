@@ -152,6 +152,18 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBAction func subViewDone(_ sender: Any) {
         self.subView.removeFromSuperview()
     }
+    
+    @IBOutlet var modelView: UITableView!
+    
+    @IBAction func ModelsButton(_sender: UIButton){
+        print("Models Button Pressed")
+        self.view.addSubview(modelView)
+        modelView.center = self.view.center
+    }
+    
+    @IBAction func modelViewFinish(_sender: Any){
+        self.subView.removeFromSuperview()
+    }
 
     /*
     @IBAction func trackingStateSwitch(_ sender: UISwitch) {
