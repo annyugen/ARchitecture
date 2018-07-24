@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		9200CAF020F276A3001FAE6F /* SettingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9200CAEF20F276A3001FAE6F /* SettingViewController.swift */; };
 		926695D220CEF3DE00CABFD8 /* art.scnassets in Resources */ = {isa = PBXBuildFile; fileRef = 926695D120CEF3DE00CABFD8 /* art.scnassets */; };
+		926C9F2E210582E5003FB0E6 /* ObjectSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926C9F2D210582E5003FB0E6 /* ObjectSelectionView.swift */; };
+		926C9F3021058521003FB0E6 /* ObjectCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926C9F2F21058521003FB0E6 /* ObjectCell.swift */; };
+		926C9F3221058666003FB0E6 /* Object.swift in Sources */ = {isa = PBXBuildFile; fileRef = 926C9F3121058666003FB0E6 /* Object.swift */; };
 		92BFA76B20D750F8006FF48D /* Focus Square in Resources */ = {isa = PBXBuildFile; fileRef = 92BFA76A20D750F8006FF48D /* Focus Square */; };
 		92E87AD020CEF1B800CBDF15 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E87ACF20CEF1B800CBDF15 /* AppDelegate.swift */; };
 		92E87AD220CEF1B800CBDF15 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92E87AD120CEF1B800CBDF15 /* ViewController.swift */; };
@@ -21,6 +24,9 @@
 /* Begin PBXFileReference section */
 		9200CAEF20F276A3001FAE6F /* SettingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingViewController.swift; sourceTree = "<group>"; };
 		926695D120CEF3DE00CABFD8 /* art.scnassets */ = {isa = PBXFileReference; lastKnownFileType = wrapper.scnassets; path = art.scnassets; sourceTree = "<group>"; };
+		926C9F2D210582E5003FB0E6 /* ObjectSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectSelectionView.swift; sourceTree = "<group>"; };
+		926C9F2F21058521003FB0E6 /* ObjectCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ObjectCell.swift; sourceTree = "<group>"; };
+		926C9F3121058666003FB0E6 /* Object.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Object.swift; sourceTree = "<group>"; };
 		92BFA76A20D750F8006FF48D /* Focus Square */ = {isa = PBXFileReference; lastKnownFileType = folder; path = "Focus Square"; sourceTree = "<group>"; };
 		92E87ACC20CEF1B800CBDF15 /* ARchitectureWithUI.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ARchitectureWithUI.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		92E87ACF20CEF1B800CBDF15 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -73,11 +79,14 @@
 				926695D320CEF4FB00CABFD8 /* Resources */,
 				92E87ACF20CEF1B800CBDF15 /* AppDelegate.swift */,
 				92E87AD120CEF1B800CBDF15 /* ViewController.swift */,
-				9200CAEF20F276A3001FAE6F /* SettingViewController.swift */,
+				926C9F2D210582E5003FB0E6 /* ObjectSelectionView.swift */,
+				926C9F2F21058521003FB0E6 /* ObjectCell.swift */,
+				926C9F3121058666003FB0E6 /* Object.swift */,
 				92EBE14B20D5F13900D777EE /* TrackingStatusViewController.swift */,
 				92E87AD320CEF1B800CBDF15 /* Main.storyboard */,
 				92E87AD820CEF1B900CBDF15 /* LaunchScreen.storyboard */,
 				92E87ADB20CEF1B900CBDF15 /* Info.plist */,
+				9200CAEF20F276A3001FAE6F /* SettingViewController.swift */,
 				92BFA76A20D750F8006FF48D /* Focus Square */,
 				926695D120CEF3DE00CABFD8 /* art.scnassets */,
 			);
@@ -157,7 +166,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				926C9F2E210582E5003FB0E6 /* ObjectSelectionView.swift in Sources */,
 				92E87AD220CEF1B800CBDF15 /* ViewController.swift in Sources */,
+				926C9F3021058521003FB0E6 /* ObjectCell.swift in Sources */,
+				926C9F3221058666003FB0E6 /* Object.swift in Sources */,
 				92E87AD020CEF1B800CBDF15 /* AppDelegate.swift in Sources */,
 				92EBE14C20D5F13900D777EE /* TrackingStatusViewController.swift in Sources */,
 				9200CAF020F276A3001FAE6F /* SettingViewController.swift in Sources */,

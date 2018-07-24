@@ -17,7 +17,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet weak var statusLabel: UILabel!
     
     //Mark: Variables
-    var modelNode: SCNNode?
+    var currentModelNode: SCNNode?
     var currentAngleY: Float = 0.0
     var secondResultLabelText : String!
     
@@ -83,19 +83,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     //Add button, hitTest the middle point on device screen. Then call addModel.
     @IBAction func AddButton(_ sender: UIButton) {
         print("AddBtnTapped")
-        //Create center point at screen to hitTest the center of the screen.
-        let centerCGPoint = CGPoint(x: UIScreen.main.bounds.width*0.5, y: UIScreen.main.bounds.height*0.5)
-        guard let hitTest = sceneView.hitTest(centerCGPoint, types: .existingPlaneUsingExtent).first else {return}
-        
-        //Create anchor at hitTest location
-        let anchor = ARAnchor(transform: hitTest.worldTransform)
+        if (currentModelNode == nil) {
+            //present(ObjectSelectionView, animated: true, completion: nil)
+            performSegue(withIdentifier: "ObjectSelectionSegue", sender: self)
+        } else {
+            //Create center point at screen to hitTest the center of the screen.
+            let centerCGPoint = CGPoint(x: UIScreen.main.bounds.width*0.5, y: UIScreen.main.bounds.height*0.5)
+            guard let hitTest = sceneView.hitTest(centerCGPoint, types: .existingPlaneUsingExtent).first else {return}
             
-        //Add anchor to the scene
-        sceneView.session.add(anchor: anchor)
-        
-        //Calling addModel to add the model onto a detected plane.
-        addModel(hitTest: hitTest)
-        print(modelNode!)
+            //Create anchor at hitTest location
+            let anchor = ARAnchor(transform: hitTest.worldTransform)
+            
+            //Add anchor to the scene
+            sceneView.session.add(anchor: anchor)
+            
+            //Calling addModel to add the model onto a detected plane.
+            addModel(hitTest: hitTest)
+            print(currentModelNode!)
+        }
     }
     
     @IBAction func ResetButton(_ sender: UIButton) {
@@ -228,16 +233,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Set the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
-        modelNode = houseNode
-        sceneView.scene.rootNode.addChildNode(modelNode!)
-        print(modelNode?.name! as Any)
+        currentModelNode = houseNode
+        sceneView.scene.rootNode.addChildNode(currentModelNode!)
+        print(currentModelNode?.name! as Any)
         
     }
     
     //MARK: Anchored object manipulation
     //Rotation of model node.
     @objc func rotate(_ gesture: UIPanGestureRecognizer) {
-        guard let nodeToRotate = modelNode else {return}
+        guard let nodeToRotate = currentModelNode else {return}
         let translation = gesture.translation(in: gesture.view!)
         
         var newAngleY = (Float)(translation.x)*(Float)(Double.pi)/180.0
@@ -252,7 +257,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     //Scaling of the model node.
     @objc func scale(_ gesture: UIPinchGestureRecognizer) {
-        guard let nodeToScale = modelNode else {return}
+        guard let nodeToScale = currentModelNode else {return}
         
         if gesture.state == .changed {
             let pinchToScaleX: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.x)
