@@ -8,9 +8,25 @@
 
 import UIKit
 
+//Pass checked model to View Controller using delegate//
+protocol ModelDelegate {
+    func onModelSelected(dataArray : Array<Any>)  //Initialize protocol for function//
+}
 class ModelViewController : UITableViewController {
+    var delegate : ModelDelegate!
+    var ModelArray = Array<Any>()
+    
+    @IBAction func sendData(sender: Any){
+        self.dismiss(animated: true){
+            self.delegate.onModelSelected(dataArray: self.ModelArray)
+        }
+    }
+    
     var models = ["house", "house1", "house2", "house3","house4", "house 5"]
     var checkedModels = [String]()
+    var test:Array = [String]()
+    
+    var modelTestView = ModelViewController()
     
     
     var ViewController:ViewController?
@@ -52,6 +68,7 @@ class ModelViewController : UITableViewController {
         }
         
     }
+    
     
     
   

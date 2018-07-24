@@ -11,7 +11,27 @@ import ARKit
 import Foundation
 
 
-class ViewController: UIViewController, ARSCNViewDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate, ModelDelegate {
+    //Mark: Outlets
+    @IBOutlet weak var ARSCNView: ARSCNView!
+    @IBOutlet var sceneView: ARSCNView!
+    @IBOutlet weak var statusLabel: UILabel!
+    var delegate: ModelDelegate!
+    var ModelViewController: UITableView!
+    
+    var modelArray = Array<Any>()
+    
+    func onModelSelected(dataArray: Array<Any>) {
+        modelArray = dataArray
+        self.ModelViewController.reloadData()
+    }
+    
+    func showData(for segue: UIStoryboardSegue, sender: Any?){
+        if let destinationVC = segue.destination as? ModelViewController{
+            destinationVC.delegate = self
+        }
+    }
+    
     
     struct AnimationInfo{
         var startTime: TimeInterval
@@ -22,10 +42,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         var finalOrientation: simd_quatf
     }
 
-    //Mark: Outlets
-    @IBOutlet weak var ARSCNView: ARSCNView!
-    @IBOutlet var sceneView: ARSCNView!
-    @IBOutlet weak var statusLabel: UILabel!
+    
+    
     
     var state = false
     var featurePts = ARSCNDebugOptions.showFeaturePoints
