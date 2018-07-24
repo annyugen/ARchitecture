@@ -58,18 +58,14 @@ class ModelViewController : UITableViewController {
     }
     
     
-    //Check mark//
+    //Check mark add to array one at a time//
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if tableView.cellForRow(at: indexPath)?.accessoryType == UITableViewCellAccessoryType.checkmark {
-             tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.none
-        } else{
-             tableView.cellForRow(at: indexPath)?.accessoryType = UITableViewCellAccessoryType.checkmark
-             checkedModels.append(models[indexPath.row]) //Array of checked models, not sure//
-        }
-        
+        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        checkedModels.append(models[indexPath.row]) //Array of checked models, not sure//
     }
-    
-    
-    
-  
+    //Remove on deselect//
+    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
+        tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        checkedModels.remove(at: indexPath.row)
+    }
 }

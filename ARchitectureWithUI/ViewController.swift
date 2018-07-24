@@ -23,7 +23,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ModelDelegate {
     
     func onModelSelected(dataArray: Array<Any>) {
         modelArray = dataArray
-        self.ModelViewController.reloadData()
+        self.ModelViewController.reloadData() //Load checkedModels from ModelViewController//
     }
     
     func showData(for segue: UIStoryboardSegue, sender: Any?){
@@ -31,8 +31,6 @@ class ViewController: UIViewController, ARSCNViewDelegate, ModelDelegate {
             destinationVC.delegate = self
         }
     }
-    
-    
     struct AnimationInfo{
         var startTime: TimeInterval
         var duration: TimeInterval
