@@ -20,6 +20,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var modelNode: SCNNode?
     var currentAngleY: Float = 0.0
     var secondResultLabelText : String!
+    // Animation for image highlighting when recognized
     var imageHighlightAction: SCNAction {
         return .sequence([
             .wait(duration: 0.25),
@@ -119,6 +120,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Re-initialize a new SCNScene session while clearing the previous session.
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal]
+        configuration.detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil)
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -227,7 +229,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
 //        houseNode?.runAction(appearanceAction)
         
 
-        
+        // Works fine, the model follows the recognized image as long as the image moves slowly.
         let referenceImage = imageAnchor.referenceImage
         let imageName = imageAnchor.referenceImage.name
 
@@ -236,6 +238,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Drawing out the plane and re-position it so it's parallel to the deteced image
         let plane = SCNPlane(width: referenceImage.physicalSize.width, height: referenceImage.physicalSize.height)
         let planeNode = SCNNode(geometry: plane)
+        let ratio = (referenceImage.physicalSize.width / referenceImage.physicalSize.height)
         planeNode.opacity = 0.20
         planeNode.eulerAngles.x = -.pi/2
 
@@ -246,7 +249,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         if imageName == "house-blueprint" {
             let scene = SCNScene(named: "art.scnassets/house.scn")!
             let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
-            houseNode?.position = SCNVector3(imageAnchor.transform.columns.3.x,imageAnchor.transform.columns.3.y + 0.1,imageAnchor.transform.columns.3.z)
+//            let pitch = sceneView.session.currentFrame?.camera.eulerAngles.x
+//            let yawn = sceneView.session.currentFrame?.camera.eulerAngles.y
+//            let roll = sceneView.session.currentFrame?.camera.eulerAngles.z
+//            let newRotation = SCNVector3Make(0, 0, 0)
+//            print(newRotation)
+//            houseNode?.eulerAngles = newRotation
+            let camera = self.sceneView.pointOfView!
+            houseNode?.rotation = camera.rotation
+            houseNode?.eulerAngles.x = 0
+            //Pick smallest value to be sure that object fits into the image.
+            houseNode?.scale = SCNVector3Make(Float(ratio*0.01),Float(ratio*0.01),Float(ratio*0.01))
+            houseNode?.position = SCNVector3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
+
             sceneView.scene.rootNode.addChildNode(houseNode!)
 
 
@@ -291,6 +306,11 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Getting the house 3D model
         let scene = SCNScene(named: "art.scnassets/house.scn")!
         let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
+        
+        // 3 lines of code that rotates soon to be anchored object toward the camera/user
+        let camera = self.sceneView.pointOfView!
+        houseNode?.rotation = camera.rotation
+        houseNode?.eulerAngles.x = 0
         
         //Set the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
