@@ -20,6 +20,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     var modelNode: SCNNode?
     var currentAngleY: Float = 0.0
     var secondResultLabelText : String!
+    // Animation for image highlighting when recognized
+    var imageHighlightAction: SCNAction {
+        return .sequence([
+            .wait(duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOpacity(to: 0.15, duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOut(duration: 0.5),
+            .removeFromParentNode()
+            ])
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,6 +67,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Run the view's session
         sceneView.session.run(configuration)
         
+        // Config to track user's gestures
         let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
         let scalingGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scale))
@@ -108,6 +120,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Re-initialize a new SCNScene session while clearing the previous session.
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal]
+        configuration.detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil)
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -184,7 +197,43 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.text = "Tracking limited: initializing"
         }
     }
-    // Mark: - renderer
+    
+    // Mark: - Renderer
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        guard let imageAnchor = anchor as? ARImageAnchor else { return }
+        
+
+        // Works fine, the model follows the recognized image as long as the image moves slowly.
+        let referenceImage = imageAnchor.referenceImage
+        let imageName = imageAnchor.referenceImage.name
+
+        print("DETECTED IMAGE: ", imageName!)
+
+        // Drawing out the plane and re-position it so it's parallel to the deteced image
+        let plane = SCNPlane(width: referenceImage.physicalSize.width, height: referenceImage.physicalSize.height)
+        let planeNode = SCNNode(geometry: plane)
+        let ratio = (referenceImage.physicalSize.width / referenceImage.physicalSize.height)
+        planeNode.opacity = 0.20
+        planeNode.eulerAngles.x = -.pi/2
+
+        // Apply imageHighlightAction animation onto the plane.
+        planeNode.runAction(imageHighlightAction)
+        node.addChildNode(planeNode)
+
+        if imageName == "house-blueprint" {
+            let scene = SCNScene(named: "art.scnassets/house.scn")!
+            let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
+
+            let camera = self.sceneView.pointOfView!
+            houseNode?.rotation = camera.rotation
+            houseNode?.eulerAngles.x = 0
+            //Pick smallest value to be sure that object fits into the image.
+            houseNode?.scale = SCNVector3Make(Float(ratio*0.01),Float(ratio*0.01),Float(ratio*0.01))
+            houseNode?.position = SCNVector3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
+
+            sceneView.scene.rootNode.addChildNode(houseNode!)
+        }
+    }
     
 /**
     //There are automatically called when anchor and plane is automatically detecte by ARkit.
@@ -225,13 +274,17 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let scene = SCNScene(named: "art.scnassets/house.scn")!
         let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
         
+        // 3 lines of code that rotates soon to be anchored object toward the camera/user
+        let camera = self.sceneView.pointOfView!
+        houseNode?.rotation = camera.rotation
+        houseNode?.eulerAngles.x = 0
+        
         //Set the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
         modelNode = houseNode
         sceneView.scene.rootNode.addChildNode(modelNode!)
         print(modelNode?.name! as Any)
-        
     }
     
     //MARK: Anchored object manipulation
