@@ -202,32 +202,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
         guard let imageAnchor = anchor as? ARImageAnchor else { return }
         
-//        let scene = SCNScene(named: "art.scnassets/house.scn")!
-//        let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
-//
-//        let (min, max) = (houseNode?.boundingBox)!
-//        let size = SCNVector3Make(max.x - min.x, max.y - min.y, max.z - min.z)
-//
-//        // 3. Calculate the ratio of difference between real image and object size.
-//        // Ignore Y axis because it will be pointed out of the image.
-//        let widthRatio = Float(imageAnchor.referenceImage.physicalSize.width)/size.x
-//        let heightRatio = Float(imageAnchor.referenceImage.physicalSize.height)/size.z
-//        // Pick smallest value to be sure that object fits into the image.
-//        let finalRatio = [widthRatio, heightRatio].min()!
-//
-//        // 4. Set transform from imageAnchor data.
-//        houseNode?.transform = SCNMatrix4(imageAnchor.transform)
-//
-//        // 5. Animate appearance by scaling model from 0 to previously calculated value.
-//        let appearanceAction = SCNAction.scale(to: CGFloat(finalRatio), duration: 0.4)
-//        appearanceAction.timingMode = .easeOut
-//        // Set initial scale to 0.
-//        houseNode?.scale = SCNVector3Make(0, 0, 0)
-//        // Add to root node.
-//        sceneView.scene.rootNode.addChildNode(houseNode!)
-//        // Run the appearance animation.
-//        houseNode?.runAction(appearanceAction)
-        
 
         // Works fine, the model follows the recognized image as long as the image moves slowly.
         let referenceImage = imageAnchor.referenceImage
@@ -249,12 +223,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         if imageName == "house-blueprint" {
             let scene = SCNScene(named: "art.scnassets/house.scn")!
             let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
-//            let pitch = sceneView.session.currentFrame?.camera.eulerAngles.x
-//            let yawn = sceneView.session.currentFrame?.camera.eulerAngles.y
-//            let roll = sceneView.session.currentFrame?.camera.eulerAngles.z
-//            let newRotation = SCNVector3Make(0, 0, 0)
-//            print(newRotation)
-//            houseNode?.eulerAngles = newRotation
+
             let camera = self.sceneView.pointOfView!
             houseNode?.rotation = camera.rotation
             houseNode?.eulerAngles.x = 0
@@ -263,8 +232,6 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             houseNode?.position = SCNVector3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
 
             sceneView.scene.rootNode.addChildNode(houseNode!)
-
-
         }
     }
     
