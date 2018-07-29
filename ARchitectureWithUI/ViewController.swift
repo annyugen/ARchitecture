@@ -17,7 +17,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet weak var statusLabel: UILabel!
     
     //Mark: Variables
-    var modelNode: SCNNode?
+    var modelNode: [SCNNode] = []
+    var currentNode: SCNNode?
     var currentAngleY: Float = 0.0
     var secondResultLabelText : String!
     // Animation for image highlighting when recognized
@@ -72,6 +73,8 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
         let scalingGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scale))
         sceneView.addGestureRecognizer(scalingGestureRecognizer)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tap))
+        sceneView.addGestureRecognizer(tapGesture)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -107,7 +110,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         
         //Calling addModel to add the model onto a detected plane.
         addModel(hitTest: hitTest)
-        print(modelNode!)
+        print(currentNode!)
     }
     
     @IBAction func ResetButton(_ sender: UIButton) {
@@ -282,15 +285,16 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Set the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
-        modelNode = houseNode
-        sceneView.scene.rootNode.addChildNode(modelNode!)
-        print(modelNode?.name! as Any)
+        modelNode.append(houseNode!)
+        currentNode = houseNode
+        sceneView.scene.rootNode.addChildNode(currentNode!)
+        print(currentNode?.name! as Any)
     }
     
     //MARK: Anchored object manipulation
     //Rotation of model node.
     @objc func rotate(_ gesture: UIPanGestureRecognizer) {
-        guard let nodeToRotate = modelNode else {return}
+        guard let nodeToRotate = currentNode else {return}
         let translation = gesture.translation(in: gesture.view!)
         
         var newAngleY = (Float)(translation.x)*(Float)(Double.pi)/180.0
@@ -305,7 +309,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     //Scaling of the model node.
     @objc func scale(_ gesture: UIPinchGestureRecognizer) {
-        guard let nodeToScale = modelNode else {return}
+        guard let nodeToScale = currentNode else {return}
         
         if gesture.state == .changed {
             let pinchToScaleX: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.x)
@@ -315,21 +319,26 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             //After getting pinch intensity in CGFloat, pass them to scale.
             nodeToScale.scale = SCNVector3Make(Float(pinchToScaleX),Float(pinchToScaleY),Float(pinchToScaleZ))
             
-            print(nodeToScale.scale)
-            print("Velocity: ",gesture.velocity)
+            print(nodeToScale.scale, ". Velocity: ",gesture.velocity)
 
             gesture.scale = 1 //Reset the new scale to 1 -> give more accurate scaling.
         }
-        if gesture.state == .ended {print("Pinch gestured completed.", "Pinch scale set to: ", gesture.scale)}
+        if gesture.state == .ended {
+            print("Pinch gestured completed.", "Pinch scale reset to: ", gesture.scale)
+        }
     }
     
+    @objc func tap(_ gesture: UITapGestureRecognizer) {
+        let point = gesture.location(in: sceneView)
+        let hitTestResults = sceneView.hitTest(point, options: nil)
+        if let tappedNode = hitTestResults.first?.node {
+            // Hit-test on the anchored object. If SCNode from hitTestResult is within the modelNode array. Switch currentNode to the hit-tested node. Allow user to switch between multiple anchored nodes.
+            if modelNode.contains(tappedNode.parent!) {
+                currentNode = tappedNode.parent!
+                print("Current selected node: ", currentNode as Any)
+            }
+        }
+    }
 }
-
-
-
-
-
-
-
 
 
