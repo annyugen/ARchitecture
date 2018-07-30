@@ -17,9 +17,21 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     @IBOutlet weak var statusLabel: UILabel!
     
     //Mark: Variables
-    var currentModelNode: SCNNode?
+    var modelNode: [SCNNode] = []
+    var currentNode: SCNNode?
     var currentAngleY: Float = 0.0
     var secondResultLabelText : String!
+    // Animation for image highlighting when recognized
+    var imageHighlightAction: SCNAction {
+        return .sequence([
+            .wait(duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOpacity(to: 0.15, duration: 0.25),
+            .fadeOpacity(to: 0.85, duration: 0.25),
+            .fadeOut(duration: 0.5),
+            .removeFromParentNode()
+            ])
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -56,10 +68,13 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         // Run the view's session
         sceneView.session.run(configuration)
         
+        // Config to track user's gestures
         let rotateGestureRecognizer = UIPanGestureRecognizer(target: self, action: #selector(rotate))
         sceneView.addGestureRecognizer(rotateGestureRecognizer)
         let scalingGestureRecognizer = UIPinchGestureRecognizer(target: self, action: #selector(scale))
         sceneView.addGestureRecognizer(scalingGestureRecognizer)
+        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(tap))
+        sceneView.addGestureRecognizer(tapGesture)
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -83,24 +98,19 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     //Add button, hitTest the middle point on device screen. Then call addModel.
     @IBAction func AddButton(_ sender: UIButton) {
         print("AddBtnTapped")
-        if (currentModelNode == nil) {
-            //present(ObjectSelectionView, animated: true, completion: nil)
-            performSegue(withIdentifier: "ObjectSelectionSegue", sender: self)
-        } else {
-            //Create center point at screen to hitTest the center of the screen.
-            let centerCGPoint = CGPoint(x: UIScreen.main.bounds.width*0.5, y: UIScreen.main.bounds.height*0.5)
-            guard let hitTest = sceneView.hitTest(centerCGPoint, types: .existingPlaneUsingExtent).first else {return}
+        //Create center point at screen to hitTest the center of the screen.
+        let centerCGPoint = CGPoint(x: UIScreen.main.bounds.width*0.5, y: UIScreen.main.bounds.height*0.5)
+        guard let hitTest = sceneView.hitTest(centerCGPoint, types: .existingPlaneUsingExtent).first else {return}
+        
+        //Create anchor at hitTest location
+        let anchor = ARAnchor(transform: hitTest.worldTransform)
             
-            //Create anchor at hitTest location
-            let anchor = ARAnchor(transform: hitTest.worldTransform)
-            
-            //Add anchor to the scene
-            sceneView.session.add(anchor: anchor)
-            
-            //Calling addModel to add the model onto a detected plane.
-            addModel(hitTest: hitTest)
-            print(currentModelNode!)
-        }
+        //Add anchor to the scene
+        sceneView.session.add(anchor: anchor)
+        
+        //Calling addModel to add the model onto a detected plane.
+        addModel(hitTest: hitTest)
+        print(currentNode!)
     }
     
     @IBAction func ResetButton(_ sender: UIButton) {
@@ -113,6 +123,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         //Re-initialize a new SCNScene session while clearing the previous session.
         let configuration = ARWorldTrackingConfiguration()
         configuration.planeDetection = [.horizontal]
+        configuration.detectionImages = ARReferenceImage.referenceImages(inGroupNamed: "AR Resources", bundle: nil)
         sceneView.session.run(configuration, options: [.resetTracking, .removeExistingAnchors])
     }
     
@@ -189,7 +200,43 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             statusLabel.text = "Tracking limited: initializing"
         }
     }
-    // Mark: - renderer
+    
+    // Mark: - Renderer
+    func renderer(_ renderer: SCNSceneRenderer, didAdd node: SCNNode, for anchor: ARAnchor) {
+        guard let imageAnchor = anchor as? ARImageAnchor else { return }
+        
+
+        // Works fine, the model follows the recognized image as long as the image moves slowly.
+        let referenceImage = imageAnchor.referenceImage
+        let imageName = imageAnchor.referenceImage.name
+
+        print("DETECTED IMAGE: ", imageName!)
+
+        // Drawing out the plane and re-position it so it's parallel to the deteced image
+        let plane = SCNPlane(width: referenceImage.physicalSize.width, height: referenceImage.physicalSize.height)
+        let planeNode = SCNNode(geometry: plane)
+        let ratio = (referenceImage.physicalSize.width / referenceImage.physicalSize.height)
+        planeNode.opacity = 0.20
+        planeNode.eulerAngles.x = -.pi/2
+
+        // Apply imageHighlightAction animation onto the plane.
+        planeNode.runAction(imageHighlightAction)
+        node.addChildNode(planeNode)
+
+        if imageName == "house-blueprint" {
+            let scene = SCNScene(named: "art.scnassets/house.scn")!
+            let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
+
+            let camera = self.sceneView.pointOfView!
+            houseNode?.rotation = camera.rotation
+            houseNode?.eulerAngles.x = 0
+            //Pick smallest value to be sure that object fits into the image.
+            houseNode?.scale = SCNVector3Make(Float(ratio*0.01),Float(ratio*0.01),Float(ratio*0.01))
+            houseNode?.position = SCNVector3(anchor.transform.columns.3.x,anchor.transform.columns.3.y,anchor.transform.columns.3.z)
+
+            sceneView.scene.rootNode.addChildNode(houseNode!)
+        }
+    }
     
 /**
     //There are automatically called when anchor and plane is automatically detecte by ARkit.
@@ -230,19 +277,24 @@ class ViewController: UIViewController, ARSCNViewDelegate {
         let scene = SCNScene(named: "art.scnassets/house.scn")!
         let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)
         
+        // 3 lines of code that rotates soon to be anchored object toward the camera/user
+        let camera = self.sceneView.pointOfView!
+        houseNode?.rotation = camera.rotation
+        houseNode?.eulerAngles.x = 0
+        
         //Set the model position within the scene.
         houseNode?.position = SCNVector3(hitTest.worldTransform.columns.3.x,hitTest.worldTransform.columns.3.y, hitTest.worldTransform.columns.3.z)
         print("X: ", hitTest.worldTransform.columns.3.x,"Y: ", hitTest.worldTransform.columns.3.y,"Z:", hitTest.worldTransform.columns.3.z)
-        currentModelNode = houseNode
-        sceneView.scene.rootNode.addChildNode(currentModelNode!)
-        print(currentModelNode?.name! as Any)
-        
+        modelNode.append(houseNode!)
+        currentNode = houseNode
+        sceneView.scene.rootNode.addChildNode(currentNode!)
+        print(currentNode?.name! as Any)
     }
     
     //MARK: Anchored object manipulation
     //Rotation of model node.
     @objc func rotate(_ gesture: UIPanGestureRecognizer) {
-        guard let nodeToRotate = currentModelNode else {return}
+        guard let nodeToRotate = currentNode else {return}
         let translation = gesture.translation(in: gesture.view!)
         
         var newAngleY = (Float)(translation.x)*(Float)(Double.pi)/180.0
@@ -257,7 +309,7 @@ class ViewController: UIViewController, ARSCNViewDelegate {
     
     //Scaling of the model node.
     @objc func scale(_ gesture: UIPinchGestureRecognizer) {
-        guard let nodeToScale = currentModelNode else {return}
+        guard let nodeToScale = currentNode else {return}
         
         if gesture.state == .changed {
             let pinchToScaleX: CGFloat = gesture.scale * CGFloat(nodeToScale.scale.x)
@@ -267,21 +319,26 @@ class ViewController: UIViewController, ARSCNViewDelegate {
             //After getting pinch intensity in CGFloat, pass them to scale.
             nodeToScale.scale = SCNVector3Make(Float(pinchToScaleX),Float(pinchToScaleY),Float(pinchToScaleZ))
             
-            print(nodeToScale.scale)
-            print("Velocity: ",gesture.velocity)
+            print(nodeToScale.scale, ". Velocity: ",gesture.velocity)
 
             gesture.scale = 1 //Reset the new scale to 1 -> give more accurate scaling.
         }
-        if gesture.state == .ended {print("Pinch gestured completed.", "Pinch scale set to: ", gesture.scale)}
+        if gesture.state == .ended {
+            print("Pinch gestured completed.", "Pinch scale reset to: ", gesture.scale)
+        }
     }
     
+    @objc func tap(_ gesture: UITapGestureRecognizer) {
+        let point = gesture.location(in: sceneView)
+        let hitTestResults = sceneView.hitTest(point, options: nil)
+        if let tappedNode = hitTestResults.first?.node {
+            // Hit-test on the anchored object. If SCNode from hitTestResult is within the modelNode array. Switch currentNode to the hit-tested node. Allow user to switch between multiple anchored nodes.
+            if modelNode.contains(tappedNode.parent!) {
+                currentNode = tappedNode.parent!
+                print("Current selected node: ", currentNode as Any)
+            }
+        }
+    }
 }
-
-
-
-
-
-
-
 
 
