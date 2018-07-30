@@ -13,12 +13,13 @@ import Foundation
 
 class ViewController: UIViewController, ARSCNViewDelegate {
     //Mark: Outlets
+    @IBAction func nextPageButtonPressed(_ sender: Any) {
+        self.performSegue(withIdentifier: "SecondViewSegue", sender: self)
+    }
     @IBOutlet weak var ARSCNView: ARSCNView!
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
-    @IBAction func nextPageButtonPressed(_sender: Any){
-        self.performSegue(withIdentifier: "SecondViewSegue", sender: self)
-    }
+
     
     struct AnimationInfo{
         var startTime: TimeInterval

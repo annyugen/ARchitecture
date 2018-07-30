@@ -6,7 +6,7 @@ struct CellData {
 }
 
 
-class TableViewController: UITableViewController {
+class ModelViewController: UITableViewController {
     var myIndex = 0
     var modelArray = ["house","building_04"]
     var data = [CellData]()

@@ -92,14 +92,13 @@
                                 <rect key="frame" x="246" y="38" width="49" height="31"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             </switch>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="r1w-CW-WiR" customClass="Model" customModule="ARchitectureWithUI" customModuleProvider="target">
-                                <rect key="frame" x="18" y="38" width="50" height="30"/>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="SLm-8b-1K4">
+                                <rect key="frame" x="18" y="28" width="43" height="30"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Models">
-                                    <color key="titleColor" red="0.98022113649999998" green="1" blue="0.94539621039999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                </state>
+                                <state key="normal" title="Model"/>
                                 <connections>
-                                    <segue destination="tPV-5Z-cD5" kind="showDetail" identifier="SecondViewSegue" id="NR3-cb-f99"/>
+                                    <action selector="nextPageButtonPressed:" destination="BYZ-38-t0r" eventType="touchUpInside" id="2hf-oW-bR2"/>
+                                    <segue destination="tPV-5Z-cD5" kind="showDetail" identifier="SecondViewSegue" id="LBO-4E-PVs"/>
                                 </connections>
                             </button>
                         </subviews>
