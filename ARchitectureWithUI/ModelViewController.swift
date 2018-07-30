@@ -1,71 +1,63 @@
-//
-//  ModelViewController.swift
-//  ARchitectureWithUI
-//
-//  Created by Pham Lam on 7/23/18.
-//  Copyright © 2018 An Nguyen. All rights reserved.
-//
-
 import UIKit
 
-//Pass checked model to View Controller using delegate//
-protocol ModelDelegate {
-    func onModelSelected(dataArray : Array<Any>)  //Initialize protocol for function//
+struct CellData {
+    let image: UIImage?
+    let message: String?
 }
-class ModelViewController : UITableViewController {
-    var delegate : ModelDelegate!
-    var ModelArray = Array<Any>()
-    
-    @IBAction func sendData(sender: Any){
-        self.dismiss(animated: true){
-            self.delegate.onModelSelected(dataArray: self.ModelArray)
-        }
-    }
-    
-    var models = ["house", "house1", "house2", "house3","house4", "house 5"]
-    var checkedModels = [String]()
-    var test:Array = [String]()
-    
-    var modelTestView = ModelViewController()
+
+
+class TableViewController: UITableViewController {
+    var myIndex = 0
+    var modelArray = ["house","building_04"]
+    var data = [CellData]()
+    var selectedText:String?
+    var result = ""
     
     
-    var ViewController:ViewController?
-    var buttonHidden = false
-    
-    override func didReceiveMemoryWarning() {
-        
-        super.didReceiveMemoryWarning()
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Do any additional setup after loading the view, typically from a nib.
+        data = [CellData.init(image: #imageLiteral(resourceName: "House"), message: modelArray[0]), CellData.init(image: #imageLiteral(resourceName: "House1"), message: modelArray[1]), CellData.init(image: #imageLiteral(resourceName: "Screen Shot 2018-04-27 at 9.53.31 PM"), message: modelArray[2])]
+        self.tableView.register(CustomCellView.self, forCellReuseIdentifier: "custom")
+        self.tableView.rowHeight = UITableViewAutomaticDimension
+        self.tableView.estimatedRowHeight = 200
+        
     }
     
-
-    @IBAction func closePopUp(_ sender: Any) {
-        dismiss(animated: false, completion: nil)
+    override func didReceiveMemoryWarning() {
+        super.didReceiveMemoryWarning()
+        // Dispose of any resources that can be recreated.
     }
     
-    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return models.count
-    }
     
-    ///List models//
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath : IndexPath) -> UITableViewCell{
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        cell.textLabel?.text = models[indexPath.row]
+    // Display as rows //
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = self.tableView.dequeueReusableCell(withIdentifier: "custom") as! CustomCellView
+        cell.images = data[indexPath.row].image
+        cell.message = data[indexPath.row].message
+        cell.layoutSubviews()
+        
         return cell
+        
+    }
+    override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return data.count
     }
     
-    
-    //Check mark add to array one at a time//
+    //Get value selected row//
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        checkedModels.append(models[indexPath.row]) //Array of checked models, not sure//
+        selectedText = self.data[indexPath.row].message
+        tableView.deselectRow(at: indexPath, animated: true)
+        self.performSegue(withIdentifier: "backToFrontSegue", sender: self)
+        
     }
-    //Remove on deselect//
-    override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-        tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        checkedModels.remove(at: indexPath.row)
+    
+    // Segue for passing//
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?){
+        if segue.identifier == "backToFrontSegue"{
+            let vc = segue.destination as! ViewController
+            vc.textValue = selectedText!
+        }
     }
 }

@@ -11,26 +11,15 @@ import ARKit
 import Foundation
 
 
-class ViewController: UIViewController, ARSCNViewDelegate, ModelDelegate {
+class ViewController: UIViewController, ARSCNViewDelegate {
     //Mark: Outlets
     @IBOutlet weak var ARSCNView: ARSCNView!
     @IBOutlet var sceneView: ARSCNView!
     @IBOutlet weak var statusLabel: UILabel!
-    var delegate: ModelDelegate!
-    var ModelViewController: UITableView!
-    
-    var modelArray = Array<Any>()
-    
-    func onModelSelected(dataArray: Array<Any>) {
-        modelArray = dataArray
-        self.ModelViewController.reloadData() //Load checkedModels from ModelViewController//
+    @IBAction func nextPageButtonPressed(_sender: Any){
+        self.performSegue(withIdentifier: "SecondViewSegue", sender: self)
     }
     
-    func showData(for segue: UIStoryboardSegue, sender: Any?){
-        if let destinationVC = segue.destination as? ModelViewController{
-            destinationVC.delegate = self
-        }
-    }
     struct AnimationInfo{
         var startTime: TimeInterval
         var duration: TimeInterval
@@ -40,9 +29,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ModelDelegate {
         var finalOrientation: simd_quatf
     }
 
-    
-    
-    
+    var textValue = ""
     var state = false
     var featurePts = ARSCNDebugOptions.showFeaturePoints
     
@@ -61,6 +48,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ModelDelegate {
         sceneView.delegate = self
         self.statusLabel.isHidden = state
         self.sceneView.debugOptions = featurePts
+        print(textValue)
         
         //Display arkit stat
         sceneView.showsStatistics = true
@@ -292,7 +280,7 @@ class ViewController: UIViewController, ARSCNViewDelegate, ModelDelegate {
         return
         }
         //Get 3D model//
-        let scene = SCNScene(named: "art.scnassets/house.scn")!
+        let scene = SCNScene(named: "art.scnassets/\(textValue).scn")!
         let houseNode = scene.rootNode.childNode(withName: "house", recursively: true)!
     
         ///Calculate bounding box//
