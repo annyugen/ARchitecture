@@ -11,7 +11,7 @@ Software requirement:
 Hardware requirement: 
 * iPhone Devices: iPhone 8, iPhone 8 Plus, iPhone X, iPhone 7, Iphone 7 Plus, iPhone 6s, Iphone 6s Plus, iPhone SE, iPhone 6.
 * iPad Devices: iPad Pro (12.9-inch), iPad Pro (9.7-inch), iPad Pro 12.9-inch (2nd generation), iPad (5th generation).
-**Note: *ARchitecture* is currently using ARKit 1.5 which will require the iOS firmware version to be 11.3+ to run. **
+**Note: _ARchitecture_ is currently using ARKit 1.5 which will require the iOS firmware version to be 11.3+ to run. **
 
 
 ### Installing
