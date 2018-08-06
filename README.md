@@ -4,6 +4,9 @@
 ## Getting Started
 If you are interested in developing *ARchitecture*, I recommend that you already had a basic understanding of Xcode, Swift, and ARKit. If not, check 'Built With' section below to learn more. 
 
+## Documentation
+There is a developer documentation and user documentation inside /DOC folder. 
+
 ### Prerequisites
 Software requirement:
 * Xcode (preferably with the latest version)
