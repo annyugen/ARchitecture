@@ -11,7 +11,7 @@ Software requirement:
 Hardware requirement: 
 * iPhone Devices: iPhone 8, iPhone 8 Plus, iPhone X, iPhone 7, Iphone 7 Plus, iPhone 6s, Iphone 6s Plus, iPhone SE, iPhone 6.
 * iPad Devices: iPad Pro (12.9-inch), iPad Pro (9.7-inch), iPad Pro 12.9-inch (2nd generation), iPad (5th generation).
-**Note: _ARchitecture_ is currently using ARKit 1.5 which will require the iOS firmware version to be 11.3+ to run. **
+** Note: _ARchitecture_ is currently using ARKit 1.5 which will require the iOS firmware version to be 11.3+ to run. **
 
 
 ### Installing
@@ -43,4 +43,4 @@ This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md
 ## Acknowledgments
 * I would like to thanks Apple for developing ARKit and all the ARKit communities. 
 * I appreciates all the 3D models shared by talented 3D modelers on Free3D.
-* Shout out to my professor/project advisor
+* Shout out to my professor/project advisor.
