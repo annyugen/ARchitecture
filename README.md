@@ -33,7 +33,7 @@ Apple requires their developer to subcribe to their Apple Developer Program in o
 * [Free3D](https://free3d.com/) - Website that shares 3D models. 
 
 ## Authors
-* **An Nguyen*
+* **An Nguyen**
 * **Lam Pham**
 
 ## License
