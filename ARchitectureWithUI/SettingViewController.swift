@@ -11,10 +11,9 @@ import UIKit
 
 class SettingViewController: UIViewController {
     @IBOutlet weak var PopUpView: UIView!
-    @IBOutlet weak var TrackingLabel: UILabel!
-    
     var ViewController:ViewController?
     var buttonHidden = false
+    @IBOutlet weak var TrackingLabel: UILabel!
     var completionHandler:((String) -> Int)?
     
     override func viewDidLoad() {
@@ -39,23 +38,13 @@ class SettingViewController: UIViewController {
     }
 
     @IBAction func trackingStateSwitch(_ sender: UISwitch) {
-        let getState = storyboard!.instantiateInitialViewController() as! ViewController
-        
         if (sender.isOn == false) {
-            getState.state = true
-        } else{
-            getState.state = false
+            
         }
     }
     
+    
     @IBAction func featurePointSwitch(_ sender: UISwitch) {
-        let getFeatureStatus = storyboard!.instantiateInitialViewController() as! ViewController
-        if (sender.isOn == true){
-            let temp = getFeatureStatus.featurePts
-            getFeatureStatus.featurePts = temp
-        } else {
-            getFeatureStatus.featurePts = []
-        }
     }
     
     

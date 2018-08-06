@@ -2,7 +2,7 @@
   "images" : [
     {
       "idiom" : "universal",
-      "filename" : "house-blueprint.jpg"
+      "filename" : "colored-blueprint.jpg"
     }
   ],
   "info" : {
@@ -10,7 +10,7 @@
     "author" : "xcode"
   },
   "properties" : {
-    "width" : 8.3000000000000007,
-    "unit" : "inches"
+    "width" : 93,
+    "unit" : "centimeters"
   }
 }
